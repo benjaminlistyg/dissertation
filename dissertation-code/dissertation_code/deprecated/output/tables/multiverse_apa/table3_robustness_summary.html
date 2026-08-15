@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'>
+<style>
+  /* Landscape US Letter content area (11in x 8.5in minus 1in margins) */
+  @page { size: 11in 8.5in landscape; margin: 0.75in; }
+  body { font-family: 'Times New Roman', Times, serif; font-size: 11pt;
+         color: #000; background: #fff; margin: 24px;
+         max-width: 9.5in; }
+  .apa-table-number { font-weight: normal; margin: 0 0 2px 0; }
+  .apa-table-title  { font-style: italic; font-weight: normal; margin: 0 0 8px 0; }
+
+  /* APA table: no vertical rules; horizontal rules only at top, under
+     header(s), and at bottom of body. White-space:nowrap prevents
+     cell values from wrapping to a new line. */
+  table.apa { border-collapse: collapse; border-spacing: 0;
+              margin: 0; font-family: 'Times New Roman', Times, serif;
+              font-size: 11pt; table-layout: auto; }
+  table.apa, table.apa th, table.apa td { border: none; }
+  table.apa th, table.apa td {
+    padding: 3px 6px;
+    vertical-align: bottom;
+    white-space: nowrap;            /* keep values on one line */
+  }
+  table.apa thead tr:first-child th { border-top: 1px solid #000; }
+  table.apa thead tr:last-child  th { border-bottom: 1px solid #000; }
+  table.apa tbody tr:last-child  td { border-bottom: 1px solid #000; }
+  /* Spanner header rule: bottom border under multi-column group labels */
+  table.apa thead tr.apa-spanner th[colspan] { border-bottom: 1px solid #000; }
+  table.apa thead tr.apa-spanner th         { padding-bottom: 2px; }
+
+  /* APA column-header formatting: centered, regular weight, italic
+     statistical symbols handled inline. */
+  table.apa th { font-weight: normal; text-align: center; }
+  table.apa td.apa-text { text-align: left;  white-space: normal; }  /* allow wrap in label cols */
+  table.apa td.apa-num  { text-align: center; }
+
+  .apa-note { font-size: 11pt; margin-top: 6px; max-width: 9.5in; }
+  .apa-note .apa-italic { font-style: italic; }
+  /* Secondary line inside packed multi-statistic cells */
+  .apa-sub { font-size: 9.5pt; }
+</style>
+</head><body><p class="apa-table-number">Table 5</p><p class="apa-table-title">Multiverse Robustness Summary by Wave, Term Type, and Outcome</p><table class="apa"><thead><tr><th>Wave</th><th>Term Type</th><th>Outcome</th><th><i>k</i> Specs</th><th><i>k</i> Sig</th><th>% Sig</th><th>Median &beta;</th><th>&beta; Range</th><th>Median <i>p</i></th></tr></thead><tbody><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF main effect</td><td class="apa-text">Neg F→W</td><td class="apa-num">16</td><td class="apa-num">2</td><td class="apa-num">12.5</td><td class="apa-num">.021</td><td class="apa-num">[-.188, .195]</td><td class="apa-num">.350</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF main effect</td><td class="apa-text">Neg W→F</td><td class="apa-num">16</td><td class="apa-num">1</td><td class="apa-num">6.2</td><td class="apa-num">-.022</td><td class="apa-num">[-.290, .084]</td><td class="apa-num">.355</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF main effect</td><td class="apa-text">Pos F→W</td><td class="apa-num">16</td><td class="apa-num">1</td><td class="apa-num">6.2</td><td class="apa-num">-.041</td><td class="apa-num">[-.248, .235]</td><td class="apa-num">.297</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF main effect</td><td class="apa-text">Pos W→F</td><td class="apa-num">16</td><td class="apa-num">2</td><td class="apa-num">12.5</td><td class="apa-num">.025</td><td class="apa-num">[-.039, .309]</td><td class="apa-num">.379</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Neg F→W</td><td class="apa-num">9</td><td class="apa-num">1</td><td class="apa-num">11.1</td><td class="apa-num">.008</td><td class="apa-num">[-.171, .213]</td><td class="apa-num">.502</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Neg W→F</td><td class="apa-num">9</td><td class="apa-num">0</td><td class="apa-num">0.0</td><td class="apa-num">.024</td><td class="apa-num">[-.053, .268]</td><td class="apa-num">.353</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Pos F→W</td><td class="apa-num">9</td><td class="apa-num">1</td><td class="apa-num">11.1</td><td class="apa-num">-.003</td><td class="apa-num">[-.320, .181]</td><td class="apa-num">.479</td></tr><tr><td class="apa-text">MIDUS 2</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Pos W→F</td><td class="apa-num">9</td><td class="apa-num">1</td><td class="apa-num">11.1</td><td class="apa-num">-.082</td><td class="apa-num">[-.301, .104]</td><td class="apa-num">.484</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF main effect</td><td class="apa-text">Neg F→W</td><td class="apa-num">16</td><td class="apa-num">3</td><td class="apa-num">18.8</td><td class="apa-num">-.020</td><td class="apa-num">[-.318, .258]</td><td class="apa-num">.374</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF main effect</td><td class="apa-text">Neg W→F</td><td class="apa-num">16</td><td class="apa-num">3</td><td class="apa-num">18.8</td><td class="apa-num">.047</td><td class="apa-num">[-.057, .314]</td><td class="apa-num">.440</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF main effect</td><td class="apa-text">Pos F→W</td><td class="apa-num">16</td><td class="apa-num">1</td><td class="apa-num">6.2</td><td class="apa-num">-.052</td><td class="apa-num">[-.261, .026]</td><td class="apa-num">.182</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF main effect</td><td class="apa-text">Pos W→F</td><td class="apa-num">16</td><td class="apa-num">1</td><td class="apa-num">6.2</td><td class="apa-num">-.048</td><td class="apa-num">[-.584, .024]</td><td class="apa-num">.218</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Neg F→W</td><td class="apa-num">9</td><td class="apa-num">1</td><td class="apa-num">11.1</td><td class="apa-num">-.069</td><td class="apa-num">[-.285, .260]</td><td class="apa-num">.154</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Neg W→F</td><td class="apa-num">9</td><td class="apa-num">0</td><td class="apa-num">0.0</td><td class="apa-num">-.071</td><td class="apa-num">[-.317, .084]</td><td class="apa-num">.372</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Pos F→W</td><td class="apa-num">9</td><td class="apa-num">0</td><td class="apa-num">0.0</td><td class="apa-num">.152</td><td class="apa-num">[-.074, .243]</td><td class="apa-num">.373</td></tr><tr><td class="apa-text">MIDUS 3</td><td class="apa-text">EF × Moderator</td><td class="apa-text">Pos W→F</td><td class="apa-num">9</td><td class="apa-num">1</td><td class="apa-num">11.1</td><td class="apa-num">.095</td><td class="apa-num">[-.069, .605]</td><td class="apa-num">.432</td></tr></tbody></table><p class="apa-note"><span class="apa-italic">Note.</span> Robustness summary across all multiverse specifications. % Sig = percentage of specifications with <span class='apa-italic'>p</span> &lt; .05. &beta; = standardized regression coefficient.</p></body></html>

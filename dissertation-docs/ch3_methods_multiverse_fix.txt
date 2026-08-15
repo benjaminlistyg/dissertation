@@ -1,0 +1,10 @@
+CHAPTER 3 — MULTIVERSE ANALYSIS PARAGRAPH REPLACEMENT
+======================================================
+
+FIND THIS PARAGRAPH (in the "Supplemental Analyses" section of Methods):
+
+"Multiverse analysis. A preregistered multiverse analysis assessed the robustness of findings across reasonable analytic decisions. Three arms were examined: (a) covariate specifications, including models with no covariates, demographics only, work hours as an alternative to self-report job demands, and education as the sole SES indicator; (b) covariate-as-moderator specifications, testing interactions between each covariate and executive functioning; and (c) alternative inclusion criteria, including restricting to respondents employed only (without requiring partner employment) and restricting to full-time employees (35+ hours per week)."
+
+REPLACE WITH:
+
+Multiverse analysis. A preregistered multiverse analysis assessed the robustness of findings across reasonable analytic decisions. Four arms were examined: (a) covariate specifications, including models with no covariates, demographics only, and education as the sole SES indicator; (b) covariate-as-moderator specifications, testing interactions between each covariate (age, education, income, job demands, and family demands) and executive functioning; (c) alternative inclusion criteria, restricting the sample to dual-earner couples (i.e., households in which both the respondent and spouse were employed at the time of data collection) and running all 20 regression models as a robustness check; and (d) model-set specific complete-case samples, in which each model set (main effects, gender moderation, supervisor moderation, coworker moderation, spousal moderation) used its own complete-case sample rather than a single consistent sample across all models.

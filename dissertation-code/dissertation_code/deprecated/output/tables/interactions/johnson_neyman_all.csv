@@ -1,0 +1,25 @@
+wave,outcome,moderator,model,int_p,jn_lower,jn_upper
+M2,NegF->W,Supervisor Support,m9_super_negfw_m2,0.20387552773792428,-Inf,Inf
+M2,NegW->F,Supervisor Support,m10_super_negwf_m2,0.9066577374187046,-Inf,Inf
+M2,PosF->W,Supervisor Support,m11_super_posfw_m2,0.07912257600800122,11.426778573812681,33.58250263928114
+M2,PosW->F,Supervisor Support,m12_super_poswf_m2,0.19294182723906841,-Inf,Inf
+M2,NegF->W,Coworker Support,m13_cowork_negfw_m2,0.5579984938405734,-Inf,Inf
+M2,NegW->F,Coworker Support,m14_cowork_negwf_m2,0.013639425849579057,5.687554433221633,9.902846574436843
+M2,PosF->W,Coworker Support,m15_cowork_posfw_m2,0.2126607299433178,8.150584884519553,9.226541906010798
+M2,PosW->F,Coworker Support,m16_cowork_poswf_m2,0.3815258396174668,-Inf,Inf
+M2,NegF->W,Spousal Support,m17_spouse_negfw_m2,0.9861876605783068,-Inf,Inf
+M2,NegW->F,Spousal Support,m18_spouse_negwf_m2,0.16685937209863957,-Inf,Inf
+M2,PosF->W,Spousal Support,m19_spouse_posfw_m2,0.14470264621616455,11.002086296070429,21.289577379951695
+M2,PosW->F,Spousal Support,m20_spouse_poswf_m2,0.3828451662304484,-Inf,Inf
+M3,NegF->W,Supervisor Support,m9_super_negfw_m3,0.13587721063260305,-Inf,Inf
+M3,NegW->F,Supervisor Support,m10_super_negwf_m3,0.7517165433204063,-Inf,Inf
+M3,PosF->W,Supervisor Support,m11_super_posfw_m3,0.8316199041762239,-Inf,Inf
+M3,PosW->F,Supervisor Support,m12_super_poswf_m3,0.007023682294105346,9.664122930812091,16.344381451015746
+M3,NegF->W,Coworker Support,m13_cowork_negfw_m3,0.0810205750018714,-Inf,Inf
+M3,NegW->F,Coworker Support,m14_cowork_negwf_m3,0.40680328078129935,-Inf,Inf
+M3,PosF->W,Coworker Support,m15_cowork_posfw_m3,0.45339751678822593,-Inf,Inf
+M3,PosW->F,Coworker Support,m16_cowork_poswf_m3,0.10874314844962571,-Inf,Inf
+M3,NegF->W,Spousal Support,m17_spouse_negfw_m3,0.6981806717927141,-Inf,Inf
+M3,NegW->F,Spousal Support,m18_spouse_negwf_m3,0.38074059510235936,-Inf,Inf
+M3,PosF->W,Spousal Support,m19_spouse_posfw_m3,0.7097245603945115,-Inf,Inf
+M3,PosW->F,Spousal Support,m20_spouse_poswf_m3,0.454152587967371,-Inf,Inf

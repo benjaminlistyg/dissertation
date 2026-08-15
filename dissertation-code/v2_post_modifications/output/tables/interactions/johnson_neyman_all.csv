@@ -1,0 +1,25 @@
+wave,outcome,moderator,model,int_p,jn_lower,jn_upper
+M2,NegF->W,Supervisor Support,m9_super_negfw_m2,0.2139687375542512,-Inf,Inf
+M2,NegW->F,Supervisor Support,m10_super_negwf_m2,0.8910889643990291,-Inf,Inf
+M2,PosF->W,Supervisor Support,m11_super_posfw_m2,0.08368545198946878,0.1605420468977596,6.8533604415858385
+M2,PosW->F,Supervisor Support,m12_super_poswf_m2,0.18955352664530262,-Inf,Inf
+M2,NegF->W,Coworker Support,m13_cowork_negfw_m2,0.5619702199922658,-Inf,Inf
+M2,NegW->F,Coworker Support,m14_cowork_negwf_m2,0.013466214435285881,-0.7684582015719622,1.3312151096047238
+M2,PosF->W,Coworker Support,m15_cowork_posfw_m2,0.2146625518537469,0.34004274475825974,1.0903398854428892
+M2,PosW->F,Coworker Support,m16_cowork_poswf_m2,0.38066728632972235,-Inf,Inf
+M2,NegF->W,Spousal Support,m17_spouse_negfw_m2,0.9730945766671111,-Inf,Inf
+M2,NegW->F,Spousal Support,m18_spouse_negwf_m2,0.16054384145038125,-Inf,Inf
+M2,PosF->W,Spousal Support,m19_spouse_posfw_m2,0.1460217558065648,-1.7523382671566263,-0.0683766972044853
+M2,PosW->F,Spousal Support,m20_spouse_poswf_m2,0.39280574636143495,-Inf,Inf
+M3,NegF->W,Supervisor Support,m9_super_negfw_m3,0.13512132306258118,-Inf,Inf
+M3,NegW->F,Supervisor Support,m10_super_negwf_m3,0.7652927213818961,-Inf,Inf
+M3,PosF->W,Supervisor Support,m11_super_posfw_m3,0.8225068968743701,-Inf,Inf
+M3,PosW->F,Supervisor Support,m12_super_poswf_m3,0.006889613301574011,-0.4424060684472207,1.7750750887986984
+M3,NegF->W,Coworker Support,m13_cowork_negfw_m3,0.08034968383601988,-Inf,Inf
+M3,NegW->F,Coworker Support,m14_cowork_negwf_m3,0.38655634919188964,-Inf,Inf
+M3,PosF->W,Coworker Support,m15_cowork_posfw_m3,0.43934268697734435,-Inf,Inf
+M3,PosW->F,Coworker Support,m16_cowork_poswf_m3,0.1062655920650297,-Inf,Inf
+M3,NegF->W,Spousal Support,m17_spouse_negfw_m3,0.703294372689699,-Inf,Inf
+M3,NegW->F,Spousal Support,m18_spouse_negwf_m3,0.41247781182946774,-Inf,Inf
+M3,PosF->W,Spousal Support,m19_spouse_posfw_m3,0.6945627529353533,-Inf,Inf
+M3,PosW->F,Spousal Support,m20_spouse_poswf_m3,0.464496775348857,-Inf,Inf

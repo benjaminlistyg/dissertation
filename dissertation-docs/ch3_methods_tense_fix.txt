@@ -1,0 +1,151 @@
+CHAPTER 3 — FUTURE TENSE → PAST TENSE CORRECTIONS
+====================================================
+
+26 changes across the Methods chapter. Each affected paragraph is shown
+below with the corrected text. The Analytic Strategy section is already
+in past tense and needs no changes (except the hypothesis label fix
+noted at the end).
+
+
+--- SAMPLE AND PROCEDURES (paragraph 1) ---
+
+FIND:
+This study will use data from the second and third waves of the Midlife in the United States (MIDUS) study, collected between 2004-2006 and 2012-2014, respectively. The MIDUS study is a national longitudinal research project focused on understanding factors that influence health and well-being during midlife and beyond. All analyses will be conducted on both samples to ensure the robustness of this study's findings.
+
+REPLACE WITH:
+This study used data from the second and third waves of the Midlife in the United States (MIDUS) study, collected between 2004-2006 and 2012-2014, respectively. The MIDUS study is a national longitudinal research project focused on understanding factors that influence health and well-being during midlife and beyond. All analyses were conducted on both samples to ensure the robustness of this study's findings.
+
+
+--- SAMPLE AND PROCEDURES (paragraph 4) ---
+
+FIND:
+For the present investigation, final analyses will be performed on a subsample of MIDUS participants who 1) employed at the time of data collection and 2) have complete data on all variables of interest. This selection ensures that participants have the potential to experience both work and family role demands.
+
+REPLACE WITH:
+For the present investigation, final analyses were performed on a subsample of MIDUS participants who were 1) employed at the time of data collection and 2) had complete data on all variables of interest. This selection ensured that participants had the potential to experience both work and family role demands.
+
+
+--- EXECUTIVE FUNCTIONING MEASURE (paragraph 1) ---
+
+FIND:
+Executive Functioning. Executive functioning will be assessed using a subset of tests from the Brief Test of Adult Cognition by Telephone (BTACT; Lachman et al., 2014).
+
+REPLACE WITH:
+Executive Functioning. Executive functioning was assessed using a subset of tests from the Brief Test of Adult Cognition by Telephone (BTACT; Lachman et al., 2014).
+
+
+--- EXECUTIVE FUNCTIONING MEASURE (composite score paragraph) ---
+
+FIND:
+In the present study, executive functioning will be operationalized using a composite score derived from multiple BTACT exercises: the mean of z-scores for Digits Backward, Category Fluency, Number Series, Backward Counting, and the mean of switch and nonswitch trials in the Stop & Go Switch Task. This composite score is computed following the scoring procedure outlined by the Tun and Lachman (2012). Both the individual exercise responses as well as the pre-computed composite score are available in the MIDUS database. Thus, the executive functioning composite scores to be used in this analysis will be those calculated by the MIDUS research team following their established protocol rather than computed independently for this study.
+
+REPLACE WITH:
+In the present study, executive functioning was operationalized using a composite score derived from multiple BTACT exercises: the mean of z-scores for Digits Backward, Category Fluency, Number Series, Backward Counting, and the mean of switch and nonswitch trials in the Stop & Go Switch Task. This composite score is computed following the scoring procedure outlined by Tun and Lachman (2012). Both the individual exercise responses as well as the pre-computed composite score are available in the MIDUS database. Thus, the executive functioning composite scores used in this analysis were those calculated by the MIDUS research team following their established protocol rather than computed independently for this study.
+
+
+--- SPILLOVER MEASURE ---
+
+FIND:
+Spillover. Positive and negative family-to-work and work-to-family spillover will be measured on a five-point frequency scale ranging from 1
+
+REPLACE WITH:
+Spillover. Positive and negative family-to-work and work-to-family spillover were measured on a five-point frequency scale ranging from 1
+
+
+--- COWORKER SUPPORT MEASURE ---
+
+FIND:
+Coworker support. Coworker support will be measured using items originally developed for the Whitehall Health Survey of British Civil Servants (Marmot et al., 1991), which were later incorporated as a subscale within the larger job characteristics scale within MIDUS.
+
+REPLACE WITH:
+Coworker support. Coworker support was measured using items originally developed for the Whitehall Health Survey of British Civil Servants (Marmot et al., 1991), which were later incorporated as a subscale within the larger job characteristics scale within MIDUS.
+
+AND FIND:
+Scores will be reverse-coded, such that higher scores will reflect higher amounts of support. Reliability values for coworker support were
+
+REPLACE WITH:
+Scores were reverse-coded, such that higher scores reflect higher amounts of support. Reliability values for coworker support were
+
+
+--- SUPERVISOR SUPPORT MEASURE ---
+
+FIND:
+Supervisor support. Supervisor support will be measured using items originally developed for the Whitehall Health Survey of British Civil Servants (Marmot et al., 1991), which were later incorporated as a subscale within the larger job characteristics scale in MIDUS.
+
+REPLACE WITH:
+Supervisor support. Supervisor support was measured using items originally developed for the Whitehall Health Survey of British Civil Servants (Marmot et al., 1991), which were later incorporated as a subscale within the larger job characteristics scale in MIDUS.
+
+AND FIND:
+Scores will be reverse-coded, such that higher scores will reflect higher amounts of support. Reliability values for coworker support were 0.87
+
+REPLACE WITH:
+Scores were reverse-coded, such that higher scores reflect higher amounts of support. Reliability values for supervisor support were 0.87
+
+(NOTE: The original text says "Reliability values for coworker support were 0.87"
+in the Supervisor Support section — this appears to be a typo that should read
+"Reliability values for supervisor support were 0.87". Corrected above.)
+
+
+--- SPOUSAL SUPPORT MEASURE ---
+
+FIND:
+Spousal Support. Spousal support will be measured using the Social Support and Strain Scale, which assesses
+
+REPLACE WITH:
+Spousal Support. Spousal support was measured using the Social Support and Strain Scale, which assesses
+
+AND FIND:
+Scores will be constructed by calculating the mean of the values of the items in each scale. Items will be reverse-coded so that high scores reflect higher levels of received spousal support.
+
+REPLACE WITH:
+Scores were constructed by calculating the mean of the values of the items in each scale. Items were reverse-coded so that high scores reflect higher levels of received spousal support.
+
+
+--- JOB DEMANDS ---
+
+FIND:
+Job Demands. Job demands will be included following the approach used by Allen et al. (2023) who use the job demands subscale
+
+REPLACE WITH:
+Job Demands. Job demands were included following the approach used by Allen et al. (2023) who use the job demands subscale
+
+AND FIND:
+The composite score will be constructed by calculating the sum of the reverse-coded values of the items in the scale.
+
+REPLACE WITH:
+The composite score was constructed by calculating the sum of the reverse-coded values of the items in the scale.
+
+
+--- FAMILY DEMANDS ---
+
+FIND:
+Family Demands. Family demands will be computed using the strategy by Allen et al., (2023)
+
+REPLACE WITH:
+Family Demands. Family demands were computed using the strategy by Allen et al. (2023)
+
+AND FIND:
+Given the different number of scale points across the items, items will be transformed using the percent of maximum possible (POMP) method (Cohen et al., 1999): POMP = 100 × [(Observed score − Minimum possible)÷(Maximum possible − Minimum possible)]. Using this method, the minimum and maximum scores across items will be equivalent (i.e., 0 and 100, respectively). Additionally, responses will be reverse-scored when appropriate, such that higher scores will indicate greater family demands.
+
+REPLACE WITH:
+Given the different number of scale points across the items, items were transformed using the percent of maximum possible (POMP) method (Cohen et al., 1999): POMP = 100 × [(Observed score − Minimum possible)÷(Maximum possible − Minimum possible)]. Using this method, the minimum and maximum scores across items are equivalent (i.e., 0 and 100, respectively). Additionally, responses were reverse-scored when appropriate, such that higher scores indicate greater family demands.
+
+
+--- CONTROL VARIABLES PARAGRAPH ---
+
+FIND:
+In addition to family and job demands, household-level variables that will be controlled for in all analyses include household income and household size. Given the affordances income can have on against executive functioning deficits (Duncan et al., 2017) as well as the increased demands a larger household can place on an individual, controlling for these factors will aid in isolating the effect of executive functioning on spillover. Individual-level variables that will be controlled for in all analyses include age, gender, and education level (measured on a 12-point scale from "No school/some grade school" to "Ph.D./Professional degree", capturing key milestones like high school graduation, associate's, bachelor's, and master's degrees).
+
+REPLACE WITH:
+In addition to family and job demands, household-level variables that were controlled for in all analyses include household income and household size. Given the affordances income can have against executive functioning deficits (Duncan et al., 2017) as well as the increased demands a larger household can place on an individual, controlling for these factors aided in isolating the effect of executive functioning on spillover. Individual-level variables that were controlled for in all analyses include age, gender, and education level (measured on a 12-point scale from "No school/some grade school" to "Ph.D./Professional degree", capturing key milestones like high school graduation, associate's, bachelor's, and master's degrees).
+
+(NOTE: Also fixed "can have on against" → "can have against" — apparent typo in original.)
+
+
+--- ANALYTIC STRATEGY: HYPOTHESIS LABEL FIX ---
+
+FIND:
+For the social support moderation hypotheses (H7a–H10, RQ3–RQ8)
+
+REPLACE WITH:
+For the social support moderation hypotheses (H7–H12, RQ3–RQ8)

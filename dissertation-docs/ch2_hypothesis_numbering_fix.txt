@@ -1,0 +1,48 @@
+CHAPTER 2 — HYPOTHESIS NUMBERING FIXES
+=======================================
+
+There are 4 changes needed in Chapter 2 to make the hypothesis labels
+consistent with Chapter 5 (which uses H7–H12). There is also one typo
+fix ("regarding supervisor support" should be "regarding coworker support").
+
+
+--- CHANGE 1: Supervisor support hypotheses (H7a/H7b → H7/H8) ---
+
+FIND:
+H7a: Supervisor support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (i.e. less negative) as levels of supervisor support increase.
+H7b: Supervisor support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (i.e. less negative) as levels of supervisor support increase.
+
+REPLACE WITH:
+H7: Supervisor support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (i.e. less negative) as levels of supervisor support increase.
+H8: Supervisor support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (i.e. less negative) as levels of supervisor support increase.
+
+
+--- CHANGE 2: Coworker support hypotheses (H8a/H8b → H9/H10) ---
+
+FIND:
+H8a: Coworker support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (more positive) as levels of coworker support increase.
+H8b: Coworker support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (more positive) as levels of coworker support increase
+
+REPLACE WITH:
+H9: Coworker support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (more positive) as levels of coworker support increase.
+H10: Coworker support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (more positive) as levels of coworker support increase.
+
+
+--- CHANGE 3: Spousal support hypotheses (H9/H10 → H11/H12) ---
+
+FIND:
+H9: Spousal support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (more positive) as levels of spousal support increase.
+H10: Spousal support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (more positive) as levels of spousal support increase.
+
+REPLACE WITH:
+H11: Spousal support will moderate the relationship between executive functioning and negative family-to-work spillover, such that the negative relationship between executive functioning and negative family-to-work spillover will be weaker (more positive) as levels of spousal support increase.
+H12: Spousal support will moderate the relationship between executive functioning and negative work-to-family spillover, such that the negative relationship between executive functioning and negative work-to-family spillover will be weaker (more positive) as levels of spousal support increase.
+
+
+--- CHANGE 4: Typo fix in coworker RQ intro text ---
+
+FIND (in the paragraph introducing RQ5 and RQ6):
+"Therefore, I propose the following research questions regarding supervisor support, executive functioning, and positive spillover:"
+
+REPLACE WITH:
+"Therefore, I propose the following research questions regarding coworker support, executive functioning, and positive spillover:"

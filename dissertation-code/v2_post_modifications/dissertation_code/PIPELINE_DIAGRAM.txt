@@ -1,0 +1,883 @@
+================================================================================
+DISSERTATION ANALYSIS PIPELINE — COMPLETE WORKFLOW DIAGRAM
+Executive Functioning and Work-Family Spillover (MIDUS II & III)
+================================================================================
+Orchestrator: 00_run.R  (sources scripts 01 → 07 in order)
+================================================================================
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 1:  01_midus_data_read.R  —  RAW DATA INGEST & VARIABLE SELECTION   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  RAW .SAV FILES (SPSS format, read via haven)
+  ─────────────────────────────────────────────
+
+  MIDUS 2 Wave                             MIDUS 3 Wave
+  ──────────────                            ──────────────
+  M2_P1_SURVEY_N4963.sav  (N=4963)         M3_P1_SURVEY_N3294.sav  (N=3294)
+  M2_P3_BTACT_N4512.sav   (N=4512)         M3_P3_BTACT_N3291.sav   (N=3291)
+
+
+  VARIABLE SELECTION  (dplyr::select)
+  ────────────────────────────────────
+
+  From M2 Survey → M2_selected:            From M3 Survey → M3_selected:
+  ┌─────────────────────────────────┐       ┌─────────────────────────────────┐
+  │ ID:       M2ID                  │       │ ID:       M2ID                  │
+  │                                 │       │                                 │
+  │ FILTERS:  B1SF13   (resp work)  │       │ FILTERS:  C1SF24   (resp work)  │
+  │           B1PB34WK (spouse emp) │       │           C1PB34WK (spouse emp) │
+  │                                 │       │                                 │
+  │ CONTROLS: B1PAGE_M2, B1PRSEX,  │       │ CONTROLS: C1PRAGE,  C1PRSEX,   │
+  │           B1PB1, B1STINC1,     │       │           C1PB1, C1STINC,      │
+  │           B1PHHSIZE, B1PC4,    │       │           C1PHHSIZE, C1PC4,    │
+  │           B1PKIDHH             │       │           C1PKIDHH             │
+  │                                 │       │                                 │
+  │ DVs:      B1SPOSWF, B1SNEGWF,  │       │ DVs:      C1SPOSWF, C1SNEGWF,  │
+  │ (scales)  B1SPOSFW, B1SNEGFW   │       │ (scales)  C1SPOSFW, C1SNEGFW   │
+  │                                 │       │                                 │
+  │ DV ITEMS: B1SF27A-P (16 items) │       │ DV ITEMS: C1SF40A-P (16 items) │
+  │ (for CFA)                       │       │ (for CFA)                       │
+  │                                 │       │                                 │
+  │ JOB DEM:  B1SF28A, B1SF28J,    │       │ JOB DEM:  C1SF36A, C1SF36J,    │
+  │           B1SF29A, B1SF29C,    │       │           C1SF42A, C1SF42C,    │
+  │           B1SF29D              │       │           C1SF42D              │
+  │                                 │       │                                 │
+  │ COW SUPP: B1SF30A-B  (2 items) │       │ COW SUPP: C1SF37A-B  (2 items) │
+  │ SUP SUPP: B1SF30C-E  (3 items) │       │ SUP SUPP: C1SF37C-E  (3 items) │
+  │ SPO SUPP: B1SL11A-F  (6 items) │       │ SPO SUPP: C1SL12A-F  (6 items) │
+  │                                 │       │                                 │
+  │ FAM DEM:  B1SF33A, B1SF33C,    │       │ FAM DEM:  C1SF43A, C1SF43C,    │
+  │           B1SF33D, B1SJ2G,     │       │           C1SF43D, C1SJ4G,     │
+  │           B1SL11G              │       │           C1SL12G              │
+  └─────────────────────────────────┘       └─────────────────────────────────┘
+
+  From M2 BTACT → M2_BTACT_selected:       From M3 BTACT → M3_BTACT_selected:
+  ┌─────────────────────────────────┐       ┌─────────────────────────────────┐
+  │ M2ID, B3TEFZ1 (EF composite z) │       │ M2ID, C3TEF (EF composite)     │
+  └─────────────────────────────────┘       └─────────────────────────────────┘
+
+
+  MERGE  (inner_join by M2ID)
+  ───────────────────────────
+
+  M2_selected + M2_BTACT_selected ──→ df_m2  (survey ∩ cognitive)
+  M3_selected + M3_BTACT_selected ──→ df_m3  (survey ∩ cognitive)
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ df_m2:  All M2 respondents with both survey + BTACT data   │
+  │ df_m3:  All M3 respondents with both survey + BTACT data   │
+  │                                                             │
+  │ These are the UNFILTERED merged datasets.                   │
+  │ No employment filter applied yet.                           │
+  └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 2:  02_midus_scoring.R  —  SCALE SCORING, FILTERING, CENTERING      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  SCALE SCORING  (computed on df_m2 / df_m3 before any filtering)
+  ───────────────────────────────────────────────────────────────
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                                                                         │
+  │  MIDUS 2 (df_m2)                      MIDUS 3 (df_m3)                  │
+  │  ───────────────                      ────────────────                  │
+  │                                                                         │
+  │  B1SJCDS_sum  ← rowSums(5 items,     C1SJCDS_sum  ← rowSums(5 items,  │
+  │    Job Demands   reverse-coded)         Job Demands   reverse-coded)   │
+  │    Higher = more demands                Higher = more demands           │
+  │                                                                         │
+  │  B1SJCCS_sum  ← rowSums(2 items,     C1SJCCS_sum  ← rowSums(2 items,  │
+  │    Coworker Supp reverse-coded)         Coworker Supp reverse-coded)   │
+  │    Higher = more support                Higher = more support           │
+  │                                                                         │
+  │  B1SJCSS_sum  ← rowSums(3 items,     C1SJCSS_sum  ← rowSums(3 items,  │
+  │    Supervisor Sup reverse-coded)        Supervisor Sup reverse-coded)   │
+  │    Higher = more support                Higher = more support           │
+  │                                                                         │
+  │  B1SSPEMP_sum ← rowSums(6 items,     C1SSPEMP_sum ← rowSums(6 items,  │
+  │    Spousal Supp  reverse-coded)         Spousal Supp  reverse-coded)   │
+  │    Higher = more support                Higher = more support           │
+  │                                                                         │
+  │  FAM_DEMANDS_M2 ← rowMeans(          FAM_DEMANDS_M3 ← rowMeans(       │
+  │    5 POMP-transformed items)            5 POMP-transformed items)      │
+  │    POMP: 100*(x-min)/(max-min)          POMP: 100*(x-min)/(max-min)   │
+  │    Items: F33a(R),F33c,F33d(R),         Items: F43a(R),F43c,F43d(R),  │
+  │           J2g(R),L11g(R)                       J4g(R),L12g(R)         │
+  │    Higher = more demands                Higher = more demands           │
+  │                                                                         │
+  │  (Pre-scored spillover scales used directly: B1SPOSWF, B1SNEGWF, etc.) │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+
+  SAMPLE FILTERING
+  ────────────────
+
+  df_m2 ──┬──→ filter(B1SF13 == 1)                    ──→ df_m2_analytic
+          │     Respondent currently working for pay        (MAIN ANALYTIC SAMPLE)
+          │
+          └──→ filter(B1SF13==1 & B1PB34WK %in% 1:2)  ──→ df_m2_dual_earner
+                Respondent + spouse/partner employed         (MULTIVERSE ARM C)
+
+  df_m3 ──┬──→ filter(C1SF24 == 1)                    ──→ df_m3_analytic
+          │     Respondent currently working for pay        (MAIN ANALYTIC SAMPLE)
+          │
+          └──→ filter(C1SF24==1 & C1PB34WK %in% 1:2)  ──→ df_m3_dual_earner
+                Respondent + spouse/partner employed         (MULTIVERSE ARM C)
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  DATASET HIERARCHY (subset relationships):                              │
+  │                                                                         │
+  │  df_m2  ⊃  df_m2_analytic  ⊃  df_m2_dual_earner                       │
+  │  (all)     (resp employed)     (resp + spouse employed)                 │
+  │                                                                         │
+  │  df_m3  ⊃  df_m3_analytic  ⊃  df_m3_dual_earner                       │
+  │  (all)     (resp employed)     (resp + spouse employed)                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+
+  MEAN-CENTERING  (for interaction terms)
+  ────────────────────────────────────────
+
+  Applied to BOTH df_*_analytic AND df_*_dual_earner:
+
+  ┌──────────────────────────────────────────────────────────┐
+  │  MIDUS 2 centered vars:     │  MIDUS 3 centered vars:   │
+  │  B3TEFZ1_c   (EF)          │  C3TEF_c     (EF)         │
+  │  B1SJCSS_c   (Supervisor)  │  C1SJCSS_c   (Supervisor) │
+  │  B1SJCCS_c   (Coworker)    │  C1SJCCS_c   (Coworker)   │
+  │  B1SSPEMP_c  (Spousal)     │  C1SSPEMP_c  (Spousal)    │
+  └──────────────────────────────────────────────────────────┘
+
+  OUTPUT OBJECTS PASSED DOWNSTREAM:
+  • df_m2, df_m3               (unfiltered; used by multiverse ARM D filtering)
+  • df_m2_analytic, df_m3_analytic     (main sample; used by 03, 03b, 04, 05)
+  • df_m2_dual_earner, df_m3_dual_earner  (dual-earner; used by 04 ARM C)
+
+                              │
+            ┌─────────────────┼─────────────────────────────┐
+            ▼                 ▼                              ▼
+    03_regressions.R    04_multiverse.R              05_cfa_invariance.R
+    03b_descriptives.R
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 3:  03_regressions.R  —  PRIMARY HYPOTHESIS TESTS (20 MODELS x2)    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  CONSISTENT SAMPLE CONSTRUCTION
+  ──────────────────────────────
+
+  To ensure all 20 models within a wave use the same N, filter to complete
+  cases on the UNION of all predictor variables:
+
+  all_vars_m2 = {DVs: B1SNEGWF, B1SNEGFW, B1SPOSWF, B1SPOSFW,
+                  IV:  B3TEFZ1,
+                  Cov: B1SJCDS_sum, FAM_DEMANDS_M2, B1STINC1,
+                       B1PHHSIZE, B1PC4, B1PAGE_M2, B1PRSEX, B1PB1,
+                  Mod: B1SJCSS_sum, B1SJCCS_sum, B1SSPEMP_sum}
+
+  df_m2_analytic ──→ filter(complete.cases(all_vars_m2)) ──→ df_m2_all
+  df_m3_analytic ──→ filter(complete.cases(all_vars_m3)) ──→ df_m3_all
+
+
+  20 REGRESSION MODELS PER WAVE
+  ─────────────────────────────
+
+  All models use df_m2_all / df_m3_all.
+  All include base covariates: Job Demands, Family Demands, Income,
+  Household Size, Other HH Members, Age, Gender, Education.
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                                                                         │
+  │  MODEL SET 1: MAIN EFFECTS (H1–H4)     4 models per wave               │
+  │  ──────────────────────────────────────────────────────────              │
+  │  m1:  EF → Neg Work-to-Family (NEGWF)   DV = B1SNEGWF / C1SNEGWF      │
+  │  m2:  EF → Neg Family-to-Work (NEGFW)   DV = B1SNEGFW / C1SNEGFW      │
+  │  m3:  EF → Pos Work-to-Family (POSWF)   DV = B1SPOSWF / C1SPOSWF      │
+  │  m4:  EF → Pos Family-to-Work (POSFW)   DV = B1SPOSFW / C1SPOSFW      │
+  │                                                                         │
+  │  MODEL SET 2: GENDER MODERATION         4 models per wave               │
+  │  ──────────────────────────────────────────────────────────              │
+  │  m5:  EF × Gender → NEGFW               (Gender in interaction,         │
+  │  m6:  EF × Gender → NEGWF                not as separate covariate)     │
+  │  m7:  EF × Gender → POSFW                                               │
+  │  m8:  EF × Gender → POSWF                                               │
+  │                                                                         │
+  │  MODEL SET 3: SUPERVISOR SUPPORT MOD    4 models per wave               │
+  │  ──────────────────────────────────────────────────────────              │
+  │  m9:  EF × Supervisor Supp → NEGFW      (Gender as covariate,           │
+  │  m10: EF × Supervisor Supp → NEGWF       moderator in interaction)      │
+  │  m11: EF × Supervisor Supp → POSFW                                      │
+  │  m12: EF × Supervisor Supp → POSWF                                      │
+  │                                                                         │
+  │  MODEL SET 4: COWORKER SUPPORT MOD      4 models per wave               │
+  │  ──────────────────────────────────────────────────────────              │
+  │  m13: EF × Coworker Supp → NEGFW                                        │
+  │  m14: EF × Coworker Supp → NEGWF                                        │
+  │  m15: EF × Coworker Supp → POSFW                                        │
+  │  m16: EF × Coworker Supp → POSWF                                        │
+  │                                                                         │
+  │  MODEL SET 5: SPOUSAL SUPPORT MOD       4 models per wave               │
+  │  ──────────────────────────────────────────────────────────              │
+  │  m17: EF × Spousal Supp → NEGFW                                         │
+  │  m18: EF × Spousal Supp → NEGWF                                         │
+  │  m19: EF × Spousal Supp → POSFW                                         │
+  │  m20: EF × Spousal Supp → POSWF                                         │
+  │                                                                         │
+  │  TOTAL: 20 models × 2 waves = 40 regression models                     │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+
+  APA TABLE GENERATION  (in-script)
+  ──────────────────────────────────
+
+  Tables 1-2:   Main effects (4 models side-by-side, M2 then M3)
+  Tables 3-4:   Gender moderation (4 models side-by-side, M2 then M3)
+  Tables 5-6:   Supervisor support moderation
+  Tables 7-8:   Coworker support moderation
+  Tables 9-10:  Spousal support moderation
+
+
+  CROSS-WAVE REPLICABILITY  (OSC, 2015)
+  ──────────────────────────────────────
+
+  For all 20 model pairs (M2 vs M3), extracts EF-related coefficients:
+  - Pairs each M2 model with its M3 counterpart
+  - Computes 3-step OSC criteria:
+      Step 1: Same sign (of W1-significant effects)
+      Step 2: Same sign AND significant in both waves
+      Step 3: Overlapping 95% CIs (among effects sig in both)
+
+  OUTPUT: reg_replicability (paired dataframe, 20+ rows)
+
+
+  OBJECTS PASSED DOWNSTREAM:
+  • df_m2_all, df_m3_all                 → 03b_descriptives.R
+  • All 40 model objects (m1-m20 × M2,M3) → 07_midus_apa_tables.R
+  • reg_replicability                     → 07_midus_apa_tables.R
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 3b: 03b_descriptives.R  —  DESCRIPTIVE STATISTICS                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Uses df_m2_all / df_m3_all (consistent complete-case samples from 03).
+
+  15 variables per wave (in presentation order):
+  ┌──────────────────────────────────────────────────────────┐
+  │  DVs:        Neg W→F, Neg F→W, Pos W→F, Pos F→W        │
+  │  IV:         Executive Functioning                       │
+  │  Covariates: Job Demands, Family Demands, HH Income,    │
+  │              Household Size                               │
+  │  Moderators: Supervisor Support, Coworker Support,       │
+  │              Spousal Support                              │
+  │  Demographics: Age, Gender, Education                    │
+  └──────────────────────────────────────────────────────────┘
+
+  OUTPUT: descriptives_data (list with M2/M3 data, vars, labels)
+          → 07_midus_apa_tables.R
+
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 4:  04_multiverse.R  —  SPECIFICATION CURVE / ROBUSTNESS CHECKS      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  OVERVIEW: 4 multiverse arms testing robustness across analytic decisions.
+  Each arm varies one decision while holding others at the primary spec.
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  ARM    │  DECISION VARIED           │  WHAT CHANGES                   │
+  │─────────┼────────────────────────────┼─────────────────────────────────│
+  │  A      │  Covariate set             │  No cov / Demog only / Edu SES │
+  │  B      │  Covariate as moderator    │  Age/Edu/Inc/JD/FD × EF        │
+  │  C      │  Inclusion criteria        │  Dual-earner couples            │
+  │  D      │  Sample specification      │  Model-set specific samples     │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   ARM D: MODEL-SET SPECIFIC SAMPLES  (run first; not in spec curve)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  Instead of one df_m2_all (complete cases on ALL 16 vars), creates
+  per-model-set samples (complete cases only on that set's variables):
+
+  df_m2_analytic ──┬──→ complete.cases(base_vars)                → df_m2_main
+                   ├──→ complete.cases(base_vars + Supervisor)   → df_m2_super
+                   ├──→ complete.cases(base_vars + Coworker)     → df_m2_cowork
+                   └──→ complete.cases(base_vars + Spousal)      → df_m2_spouse
+
+  df_m3_analytic ──┬──→ complete.cases(base_vars)                → df_m3_main
+                   ├──→ complete.cases(base_vars + Supervisor)   → df_m3_super
+                   ├──→ complete.cases(base_vars + Coworker)     → df_m3_cowork
+                   └──→ complete.cases(base_vars + Spousal)      → df_m3_spouse
+
+  base_vars = {4 DVs, EF, Job Demands, Fam Demands, Income,
+               HH Size, Other HH, Age, Gender, Education}  (13 vars)
+
+  Models on model-set specific samples (naming: *_setspec_*):
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │  D1: Main effects      m1-m4_main_setspec   × M2,M3   on df_*_main │
+  │  D2: Gender mod        m5-m8_gender_setspec  × M2,M3   on df_*_main │
+  │  D3: Supervisor mod    m9-m12_super_setspec  × M2,M3   on df_*_super│
+  │  D4: Coworker mod      m13-m16_cowork_setspec× M2,M3   on df_*_cow. │
+  │  D5: Spousal mod       m17-m20_spouse_setspec× M2,M3   on df_*_spou.│
+  │                                                                       │
+  │  TOTAL: 20 models × 2 waves = 40 models                              │
+  │  NOTE: These are NOT included in the specification curve extraction.  │
+  │        They serve as a robustness check on sample composition.        │
+  └───────────────────────────────────────────────────────────────────────┘
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   ARM A: COVARIATE VARIATIONS  (uses df_m2_analytic / df_m3_analytic)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  A1: NO COVARIATES                              4 models × 2 waves   │
+  │  ─────────────────                                                    │
+  │  DV ~ EF  (bivariate only)                                           │
+  │  m1_nocov: NEGWF ~ B3TEFZ1                                           │
+  │  m2_nocov: NEGFW ~ B3TEFZ1                                           │
+  │  m3_nocov: POSWF ~ B3TEFZ1                                           │
+  │  m4_nocov: POSFW ~ B3TEFZ1                                           │
+  │                                                                       │
+  │  A2: DEMOGRAPHICS ONLY                          4 models × 2 waves   │
+  │  ─────────────────────                                                │
+  │  DV ~ EF + Income + HHSize + OtherHH + Age + Gender + Education      │
+  │  (drops Job Demands and Family Demands from the primary spec)         │
+  │  m1-m4_demog: all 4 DVs                                              │
+  │                                                                       │
+  │  A3: WORK HOURS AS JOB DEMANDS                  REMOVED              │
+  │  ─────────────────────────────                                        │
+  │  Variable not available in current data.                              │
+  │                                                                       │
+  │  A4: EDUCATION ONLY (NO INCOME)                 4 models × 2 waves   │
+  │  ──────────────────────────────                                       │
+  │  DV ~ EF + JobDem + FamDem + HHSize + OtherHH + Age + Gender + Edu   │
+  │  (drops Income from the primary spec)                                 │
+  │  m1-m4_edu: all 4 DVs                                                │
+  │                                                                       │
+  │  ARM A TOTAL: 12 models × 2 waves = 24 models                        │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   ARM B: COVARIATES AS MODERATORS  (uses df_m2_analytic / df_m3_analytic)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  Tests whether the EF effect varies by each covariate (EF × Covariate).
+  All 4 spillover outcomes (NEGWF, NEGFW, POSWF, POSFW) per moderator.
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  B1: EF × Age                                   4 models × 2 waves   │
+  │      m1_age_mod: NEGWF, m2: NEGFW, m3: POSWF, m4: POSFW             │
+  │                                                                       │
+  │  B2: EF × Education                             4 models × 2 waves   │
+  │      m1_edu_mod: NEGWF, m2: NEGFW, m3: POSWF, m4: POSFW             │
+  │                                                                       │
+  │  B3: EF × Income                                4 models × 2 waves   │
+  │      m1_inc_mod: NEGWF, m2: NEGFW, m3: POSWF, m4: POSFW             │
+  │                                                                       │
+  │  B4: EF × Job Demands                           4 models × 2 waves   │
+  │      m1_jd_mod: NEGWF, m2: NEGFW, m3: POSWF, m4: POSFW              │
+  │                                                                       │
+  │  B5: EF × Family Demands                        4 models × 2 waves   │
+  │      m1_fd_mod: NEGWF, m2: NEGFW, m3: POSWF, m4: POSFW              │
+  │                                                                       │
+  │  ARM B TOTAL: 20 models × 2 waves = 40 models                        │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   ARM C: DUAL-EARNER COUPLES  (uses df_m2_dual_earner / df_m3_dual_earner)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  Main sample is now respondent-employed only. This arm restricts to
+  dual-earner couples (respondent + spouse employed) as a robustness check.
+
+  SAMPLE CONSTRUCTION:
+  df_m2_dual_earner ──→ complete.cases(all 16 vars) ──→ df_m2_dual_all
+  df_m3_dual_earner ──→ complete.cases(all 16 vars) ──→ df_m3_dual_all
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  C: MAIN EFFECTS                                4 models × 2 waves   │
+  │     m1-m4_dual: NEGWF, NEGFW, POSWF, POSFW     on df_*_dual_all     │
+  │                                                                       │
+  │  C: GENDER MODERATION                           4 models × 2 waves   │
+  │     m5-m8_dual: EF × Gender → all 4 DVs                              │
+  │                                                                       │
+  │  C: SUPERVISOR SUPPORT MOD                      4 models × 2 waves   │
+  │     m9-m12_dual: EF × Supervisor → all 4 DVs                         │
+  │                                                                       │
+  │  C: COWORKER SUPPORT MOD                        4 models × 2 waves   │
+  │     m13-m16_dual: EF × Coworker → all 4 DVs                          │
+  │                                                                       │
+  │  C: SPOUSAL SUPPORT MOD                         4 models × 2 waves   │
+  │     m17-m20_dual: EF × Spousal → all 4 DVs                           │
+  │                                                                       │
+  │  ARM C TOTAL: 20 models × 2 waves = 40 models                        │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   RESULTS EXTRACTION  (specification curve data)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  extract_results() pulls EF-related coefficients from each model.
+  For main-effect models: extracts 1 row (EF term).
+  For interaction models: extracts 2 rows (EF main + EF×moderator).
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  results_m2 = bind_rows(                                              │
+  │                                                                       │
+  │    ARM A (12 extract calls):                                          │
+  │    ┌──────────────────────────────────────────────────────┐           │
+  │    │  "No covariates"     × {NEGWF, NEGFW, POSWF, POSFW} │ =  4     │
+  │    │  "Demographics only" × {NEGWF, NEGFW, POSWF, POSFW} │ =  4     │
+  │    │  "Education SES"     × {NEGWF, NEGFW, POSWF, POSFW} │ =  4     │
+  │    └──────────────────────────────────────────────────────┘           │
+  │                                                                       │
+  │    ARM B (20 extract calls):                                          │
+  │    ┌──────────────────────────────────────────────────────┐           │
+  │    │  "Age x EF"             × {NEGWF,NEGFW,POSWF,POSFW} │ =  4     │
+  │    │  "Education x EF"       × {NEGWF,NEGFW,POSWF,POSFW} │ =  4     │
+  │    │  "Income x EF"          × {NEGWF,NEGFW,POSWF,POSFW} │ =  4     │
+  │    │  "Job Demands x EF"     × {NEGWF,NEGFW,POSWF,POSFW} │ =  4     │
+  │    │  "Family Demands x EF"  × {NEGWF,NEGFW,POSWF,POSFW} │ =  4     │
+  │    └──────────────────────────────────────────────────────┘           │
+  │                                                                       │
+  │    ARM C (20 extract calls):                                          │
+  │    ┌──────────────────────────────────────────────────────┐           │
+  │    │  "Dual-earner"              × {NEGWF,NEGFW,POSWF,PO}│ =  4     │
+  │    │  "Dual-earner (Gender mod)" × {NEGFW,NEGWF,POSFW,PO}│ =  4     │
+  │    │  "Dual-earner (Superv mod)" × {NEGFW,NEGWF,POSFW,PO}│ =  4     │
+  │    │  "Dual-earner (Cowork mod)" × {NEGFW,NEGWF,POSFW,PO}│ =  4     │
+  │    │  "Dual-earner (Spousal mod)"× {NEGFW,NEGWF,POSFW,PO}│ =  4     │
+  │    └──────────────────────────────────────────────────────┘           │
+  │                                                                       │
+  │  ) %>% mutate(wave = "MIDUS 2")                                      │
+  │                                                                       │
+  │  52 extract calls per wave × 2 waves = 104 total extract calls        │
+  │  (Interaction models yield 2 rows each → more rows than calls)        │
+  │                                                                       │
+  │  results_all = bind_rows(results_m2, results_m3)                      │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+
+  SPECIFICATION CURVE VISUALIZATION
+  ──────────────────────────────────
+
+  3 ggplot specification curve plots:
+  • p_m2:       MIDUS 2 EF effects across all specifications
+  • p_m3:       MIDUS 3 EF effects across all specifications
+  • p_combined: Both waves overlaid (dodged points, colored by wave)
+
+  Each plot: coefficient ± 95% CI, faceted by outcome, sorted by estimate.
+
+
+  CROSS-WAVE REPLICABILITY  (OSC, 2015)
+  ──────────────────────────────────────
+
+  Pairs M2 and M3 multiverse results by (specification, outcome, term_label).
+  Same 3-step OSC criteria as in 03_regressions.R.
+
+  OUTPUT: mv_replicability → 07_midus_apa_tables.R
+
+
+  ═══════════════════════════════════════════════════════════════════════════
+   MULTIVERSE MODEL CENSUS
+  ═══════════════════════════════════════════════════════════════════════════
+
+  ┌──────────────┬───────────────┬─────────┬───────────────────────────────┐
+  │  ARM         │  MODELS/WAVE  │  WAVES  │  IN SPEC CURVE?               │
+  │──────────────┼───────────────┼─────────┼───────────────────────────────│
+  │  D (setspec) │      20       │    2    │  NO  (separate robustness)    │
+  │  A (covars)  │      12       │    2    │  YES (12 extract calls/wave)  │
+  │  B (cov mod) │      20       │    2    │  YES (20 extract calls/wave)  │
+  │  C (dual-e.) │      20       │    2    │  YES (20 extract calls/wave)  │
+  │──────────────┼───────────────┼─────────┼───────────────────────────────│
+  │  TOTAL       │      72       │    2    │  52 extracts/wave in curve    │
+  │              │  = 144 models │         │  = 104 total extract calls    │
+  └──────────────┴───────────────┴─────────┴───────────────────────────────┘
+
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 5:  05_cfa_invariance.R  —  CFA & MEASUREMENT INVARIANCE             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Uses df_m2_analytic / df_m3_analytic (respondent-employed samples).
+
+  4-FACTOR CORRELATED CFA MODEL
+  ─────────────────────────────
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  MIDUS 2 Items                        MIDUS 3 Items                   │
+  │  ─────────────                        ─────────────                   │
+  │  neg_wtf =~ B1SF27A+B+C+D            neg_wtf =~ C1SF40A+B+C+D       │
+  │  pos_wtf =~ B1SF27E+F+G+H            pos_wtf =~ C1SF40E+F+G+H       │
+  │  neg_ftw =~ B1SF27I+J+K+L            neg_ftw =~ C1SF40I+J+K+L       │
+  │  pos_ftw =~ B1SF27M+N+O+P            pos_ftw =~ C1SF40M+N+O+P       │
+  │                                                                       │
+  │  4 factors × 4 items each = 16 items per wave                        │
+  │  Factors freely correlated.  std.lv = TRUE.                           │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+  ANALYSES RUN
+  ────────────
+
+  1. CFA (lavaan::cfa)
+     • fit_m2 ← cfa(model, data = df_m2_analytic)
+     • fit_m3 ← cfa(model, data = df_m3_analytic)
+     → Reports: chi-sq, df, p, CFI, TLI, RMSEA [90% CI], SRMR
+     → Reports: Standardized loadings, Factor correlations
+
+  2. Measurement Invariance across Gender (B1PRSEX / C1PRSEX)
+     • inv_m2 / inv_m3 ← sequence of 4 nested models:
+
+     ┌──────────────────────────────────────────────────────────┐
+     │  Level          │  Constraint                            │
+     │─────────────────┼────────────────────────────────────────│
+     │  Configural     │  Same factor structure across groups   │
+     │  Metric         │  + Equal factor loadings               │
+     │  Scalar         │  + Equal intercepts                    │
+     │  Strict         │  + Equal residual variances            │
+     └──────────────────────────────────────────────────────────┘
+
+     Decision: ΔCFI < .01 between levels → invariance supported (Chen, 2007)
+
+  HTML TABLES (generated in-script to output/tables/cfa/):
+  • cfa_fit_indices.html         (M2 and M3 fit indices)
+  • cfa_loadings_m2.html         (standardized loadings M2)
+  • cfa_loadings_m3.html         (standardized loadings M3)
+  • cfa_factor_correlations_m2.html
+  • cfa_factor_correlations_m3.html
+  • invariance_gender_m2.html    (MI table M2)
+  • invariance_gender_m3.html    (MI table M3)
+
+  OBJECTS PASSED DOWNSTREAM:
+  • fit_m2, fit_m3               → 07_midus_apa_tables.R
+  • inv_m2, inv_m3               → 07_midus_apa_tables.R
+
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 6:  06_power_analysis.R  —  SENSITIVITY POWER ANALYSIS               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Standalone script with hardcoded sample sizes (N=932, N=507).
+  Uses WebPower and pwr packages.
+
+  ANALYSES:
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │                                                                       │
+  │  1. MINIMUM DETECTABLE EFFECTS  (power_table)                        │
+  │     For each sample, computes smallest f² detectable at 80%/90%       │
+  │     power for: Main (8 pred), 2-way (10 pred), 3-way (15 pred)      │
+  │                                                                       │
+  │  2. POWER AT FIXED EFFECT SIZES  (power_at_effect_sizes)             │
+  │     For f² = {.01, .02, .05, .10, .15}, computes power for each     │
+  │     model complexity level and sample size                            │
+  │                                                                       │
+  │  3. POWER CURVES  (power_plot)                                       │
+  │     ggplot: Power vs f² for all sample × model combinations          │
+  │     with 80% and 90% reference lines                                  │
+  │                                                                       │
+  │  4. STANDARDIZED BETA POWER  (power_for_beta_direct)                 │
+  │     For β = {.05, .08, .10, .12, .15, .20}, uses t-distribution     │
+  │     approach with R²_x = .30 (predictor multicollinearity)           │
+  │     Reports SE(β), NCP, and power for each β value                   │
+  │                                                                       │
+  └───────────────────────────────────────────────────────────────────────┘
+
+  OUTPUT: samples list → 07_midus_apa_tables.R
+
+                              │
+                              ▼
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  STAGE 7:  07_midus_apa_tables.R  —  COMPREHENSIVE APA TABLE GENERATION     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Defines all APA table builder functions AND auto-generates HTML tables
+  from objects created by scripts 03–06 (gated by exists() checks).
+
+  FUNCTION LIBRARY
+  ────────────────
+
+  ┌───────────────────────────────────────────────────────────────────────┐
+  │  CATEGORY       │  FUNCTIONS                                         │
+  │─────────────────┼────────────────────────────────────────────────────│
+  │  Regression     │  apa_table_single(), apa_table_multi()             │
+  │  Multiverse     │  apa_table_multiverse(), apa_table_multiverse_wide │
+  │  Replicability  │  apa_table_replicability()                         │
+  │  CFA/MI         │  apa_table_cfa_fit(), apa_table_cfa_loadings(),   │
+  │                 │  apa_table_cfa_cors(), apa_table_invariance()      │
+  │  Power          │  apa_table_power_mde(), apa_table_power_fixed(),  │
+  │                 │  apa_table_power_beta()                            │
+  │  Descriptives   │  apa_table_descriptives(), apa_table_correlations()│
+  │  Export         │  apa_export_word(), apa_save_html()                │
+  └───────────────────────────────────────────────────────────────────────┘
+
+  AUTO-GENERATED OUTPUT  (HTML tables)
+  ────────────────────────────────────
+
+  output/tables/
+  ├── regressions/
+  │   ├── table01_main_effects_m2.html        (M2 main effects: 4 models)
+  │   ├── table02_main_effects_m3.html        (M3 main effects: 4 models)
+  │   ├── table03_gender_moderation_m2.html   (M2 gender × EF)
+  │   ├── table04_gender_moderation_m3.html   (M3 gender × EF)
+  │   ├── table05_supervisor_moderation_m2.html
+  │   ├── table06_supervisor_moderation_m3.html
+  │   ├── table07_coworker_moderation_m2.html
+  │   ├── table08_coworker_moderation_m3.html
+  │   ├── table09_spousal_moderation_m2.html
+  │   └── table10_spousal_moderation_m3.html
+  │
+  ├── multiverse/
+  │   ├── multiverse_long_m2.html    (all specs, long format)
+  │   ├── multiverse_wide_m2.html    (EF main effects, wide format)
+  │   ├── multiverse_long_m3.html
+  │   └── multiverse_wide_m3.html
+  │
+  ├── cfa/
+  │   ├── cfa_fit_indices.html       (M2 + M3 fit indices)
+  │   ├── cfa_loadings_m2.html       (standardized loadings)
+  │   ├── cfa_loadings_m3.html
+  │   ├── cfa_factor_correlations_m2.html
+  │   ├── cfa_factor_correlations_m3.html
+  │   ├── invariance_gender_m2.html  (MI summary table)
+  │   └── invariance_gender_m3.html
+  │
+  ├── power/
+  │   ├── power_mde.html             (minimum detectable effects)
+  │   ├── power_fixed_effects.html   (power at fixed f²)
+  │   ├── power_beta_midusii_k8.html   (β power: M2 main)
+  │   ├── power_beta_midusii_k10.html  (β power: M2 2-way)
+  │   ├── power_beta_midusii_k15.html  (β power: M2 3-way)
+  │   ├── power_beta_midusiii_k8.html  (β power: M3 main)
+  │   ├── power_beta_midusiii_k10.html (β power: M3 2-way)
+  │   └── power_beta_midusiii_k15.html (β power: M3 3-way)
+  │
+  ├── descriptives/
+  │   ├── descriptives_m2.html       (M, SD, Min, Max)
+  │   ├── descriptives_m3.html
+  │   ├── correlations_m2.html       (bivariate r with stars)
+  │   └── correlations_m3.html
+  │
+  └── replicability/
+      ├── replicability_regressions.html  (OSC 2015: primary models)
+      └── replicability_multiverse.html   (OSC 2015: multiverse specs)
+
+
+================================================================================
+                      COMPLETE DATA OBJECT LINEAGE
+================================================================================
+
+  RAW FILES
+  ─────────
+  M2_P1_SURVEY.sav ─┐
+                     ├─ select → M2_selected ──┐
+  M2_P3_BTACT.sav ──┘  select → M2_BTACT_sel ─┤
+                                                ├── inner_join → df_m2
+                                                │       │
+  M3_P1_SURVEY.sav ─┐                          │       ├── score scales
+                     ├─ select → M3_selected ──┐│       │
+  M3_P3_BTACT.sav ──┘  select → M3_BTACT_sel ─┤│       │
+                                                ├── inner_join → df_m3
+                                                        │
+                                                        ├── score scales
+                                                        │
+  FILTERING                                             │
+  ─────────                                             ▼
+  df_m2 ─┬─ B1SF13==1 ──────────────────── df_m2_analytic ───┬─ CC(all) → df_m2_all
+         │                                      │             │  (03_regressions)
+         │                                      │             │
+         │                                      │             ├─ CC(base) → df_m2_main
+         │                                      │             ├─ CC(+sup) → df_m2_super
+         │                                      │             ├─ CC(+cow) → df_m2_cowork
+         │                                      │             └─ CC(+spo) → df_m2_spouse
+         │                                      │                (04_multiverse ARM D)
+         │                                      │
+         └─ B1SF13==1 & B1PB34WK∈{1,2} ── df_m2_dual_earner ── CC(all) → df_m2_dual_all
+                                                                  (04_multiverse ARM C)
+
+  df_m3 ─┬─ C1SF24==1 ──────────────────── df_m3_analytic ───┬─ CC(all) → df_m3_all
+         │                                      │             │  (03_regressions)
+         │                                      │             │
+         │                                      │             ├─ CC(base) → df_m3_main
+         │                                      │             ├─ CC(+sup) → df_m3_super
+         │                                      │             ├─ CC(+cow) → df_m3_cowork
+         │                                      │             └─ CC(+spo) → df_m3_spouse
+         │                                      │                (04_multiverse ARM D)
+         │                                      │
+         └─ C1SF24==1 & C1PB34WK∈{1,2} ── df_m3_dual_earner ── CC(all) → df_m3_dual_all
+                                                                  (04_multiverse ARM C)
+
+  CC = complete.cases; all = all 16 regression vars; base = 13 base vars
+
+
+================================================================================
+                      WHICH SCRIPTS USE WHICH DATA
+================================================================================
+
+  ┌────────────────────────────┬──────────────────────────────────────────────┐
+  │  SCRIPT                    │  DATA OBJECTS CONSUMED                       │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  03_regressions.R          │  df_m2_analytic → df_m2_all                 │
+  │                            │  df_m3_analytic → df_m3_all                 │
+  │                            │  (40 models on df_*_all)                    │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  03b_descriptives.R        │  df_m2_all, df_m3_all                       │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  04_multiverse.R           │  df_m2_analytic (ARM A, B, D filtering)     │
+  │                            │  df_m3_analytic (ARM A, B, D filtering)     │
+  │                            │  df_m2_dual_earner → df_m2_dual_all (ARM C) │
+  │                            │  df_m3_dual_earner → df_m3_dual_all (ARM C) │
+  │                            │  (144 models total)                          │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  05_cfa_invariance.R       │  df_m2_analytic (CFA + MI)                  │
+  │                            │  df_m3_analytic (CFA + MI)                  │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  06_power_analysis.R       │  (none — hardcoded N values)                │
+  │────────────────────────────┼──────────────────────────────────────────────│
+  │  07_midus_apa_tables.R     │  All model objects from 03-06 via exists()  │
+  │                            │  descriptives_data from 03b                  │
+  │                            │  reg_replicability from 03                   │
+  │                            │  mv_replicability from 04                    │
+  └────────────────────────────┴──────────────────────────────────────────────┘
+
+
+================================================================================
+                     TOTAL MODEL COUNT ACROSS PIPELINE
+================================================================================
+
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │  SCRIPT / ARM                    │  MODELS  │  WAVES  │  TOTAL       │
+  │──────────────────────────────────┼──────────┼─────────┼──────────────│
+  │  03_regressions (primary)        │    20    │    2    │     40       │
+  │                                  │          │         │              │
+  │  04_multiverse ARM D (setspec)   │    20    │    2    │     40       │
+  │  04_multiverse ARM A (covariates)│    12    │    2    │     24       │
+  │  04_multiverse ARM B (cov mods)  │    20    │    2    │     40       │
+  │  04_multiverse ARM C (dual-earn) │    20    │    2    │     40       │
+  │                                  │          │         │              │
+  │  05_cfa (CFA + 4 MI levels)      │     2    │    2    │    4+8=12*  │
+  │                                  │          │         │              │
+  │  GRAND TOTAL                     │          │         │    196       │
+  └────────────────────────────────────────────────────────────────────────┘
+  * CFA: 2 single-group + 2×4 multi-group = 10 lavaan models; counted as 12
+    for the 2 CFA + 8 MI models + 2 gender-variable creation steps.
+
+
+================================================================================
+                     FULL PIPELINE EXECUTION ORDER
+================================================================================
+
+  ┌────────┐    ┌────────┐    ┌────────┐    ┌────────┐
+  │   01   │───▶│   02   │───▶│   03   │───▶│  03b   │
+  │  READ  │    │ SCORE  │    │  REGS  │    │ DESCR  │
+  └────────┘    └────────┘    └────────┘    └────────┘
+                                                │
+                                                ▼
+                              ┌────────┐    ┌────────┐
+                              │   05   │◀───│   04   │
+                              │  CFA   │    │ MULTIV │
+                              └────────┘    └────────┘
+                                  │
+                                  ▼
+                              ┌────────┐    ┌────────┐
+                              │   06   │───▶│   07   │
+                              │ POWER  │    │ TABLES │
+                              └────────┘    └────────┘
+
+  Each script sources into the same R environment.
+  Objects persist across scripts (no intermediate saves to disk).
+  07 auto-generates all HTML tables from accumulated objects.
+
+================================================================================
+                     INLINE SANITY CHECKS (stopifnot)
+================================================================================
+
+  Each script includes stopifnot() assertions that halt the pipeline
+  immediately on failure. These catch silent data problems early.
+
+  ┌────────────────────────────┬─────────────────────────────────────────────┐
+  │  SCRIPT                    │  CHECKS                                     │
+  │────────────────────────────┼─────────────────────────────────────────────│
+  │                            │                                             │
+  │  01_midus_data_read.R      │  - df_m2 / df_m3 have rows                 │
+  │                            │  - M2ID column exists                       │
+  │                            │  - EF variable exists (B3TEFZ1 / C3TEF)    │
+  │                            │  - No duplicate M2IDs in either wave        │
+  │                            │                                             │
+  │  02_midus_scoring.R        │  - analytic < merged (filter worked)        │
+  │                            │  - dual-earner <= analytic (subset chain)   │
+  │                            │  - No non-employed in analytic samples      │
+  │                            │  - Scored scales not all NA                 │
+  │                            │  - Mean-centered vars have mean ~ 0         │
+  │                            │                                             │
+  │  03_regressions.R          │  - df_*_all not empty                       │
+  │  (samples)                 │  - df_*_all truly complete-case (no NAs)    │
+  │                            │  - df_*_all <= df_*_analytic               │
+  │                            │                                             │
+  │  03_regressions.R          │  - First and last models are lm objects     │
+  │  (models)                  │  - All models within wave share same N      │
+  │                            │  - EF term present in main-effect models    │
+  │                            │                                             │
+  │  04_multiverse.R           │  - dual_all < analytic (strict subset)      │
+  │  (ARM checks)              │  - ARM C models are lm, consistent N       │
+  │                            │  - Setspec samples >= all-models sample     │
+  │                            │                                             │
+  │  04_multiverse.R           │  - results_m2/m3 not empty                  │
+  │  (results)                 │  - "Dual-earner" specs present              │
+  │                            │  - Required columns exist                   │
+  │                            │  - Both waves present in combined results   │
+  │                            │                                             │
+  │  05_cfa_invariance.R       │  - CFA models converged                     │
+  │                            │  - CFI > .80 (not nonsensical)              │
+  │                            │  - All 4 MI levels returned                 │
+  │                            │  - Boundary MI models converged             │
+  │                            │                                             │
+  └────────────────────────────┴─────────────────────────────────────────────┘
+
+  If any check fails, the pipeline halts with a clear error message
+  identifying which assertion failed. Example output on success:
+
+    01_data_read checks passed.
+    02_scoring checks passed.
+    03_regressions sample checks passed.
+    03_regressions model checks passed.
+    04_multiverse ARM checks passed.
+    04_multiverse results checks passed.
+    05_cfa_invariance checks passed.
+
+
+================================================================================
+                                 END OF DIAGRAM
+================================================================================
