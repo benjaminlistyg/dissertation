@@ -16,7 +16,7 @@ What it does (all formatting, no content changes):
   * 1.75" top margin on first pages of sections (two blank double-spaced lines, as the guide instructs).
   * Chapter openings: "CHAPTER N" + title, centered, each on a new page.
   * Tables 1-45 and Figures 1-3 are moved to the end of the Results chapter (guide option c).
-  * Table captions above tables; figure captions below figures.
+  * APA 7 caption order for both tables and figures: bold number, italic title, object, Note.
   * Oversized tables/figures scaled to fit within the landscape text width.
   * TOC / list of tables / list of figures regenerated with real page numbers (two-pass build
     using PDF bookmarks exported by LibreOffice).
@@ -954,12 +954,12 @@ class Builder:
             self.tables.append((key, num, title))
             first = False
         for num, title, img, notes in fig_blocks:
+            # APA 7: bold number, italic title, image, then Note (same order as tables)
             key = 'Figure ' + num
-            img = normalize_p(img, jc='center', keep_next=True, pbb=not first)
+            out.extend(self.caption_pair(key, title, pbb=not first, key=key))
+            img = normalize_p(img, jc='center', keep_next=True)
             fix_drawing(img, LANDSCAPE_MAX_IMG_W_IN, LANDSCAPE_MAX_IMG_H_IN)
             out.append(img)
-            out.append(make_p([(key, {'bold': True})], keep_next=True, outline=2))
-            out.append(make_p([(title, {'italic': True})], keep_next=True))
             out.extend(notes)
             self.figures.append((key, num, title))
             first = False

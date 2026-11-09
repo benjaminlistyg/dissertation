@@ -15,6 +15,10 @@ Changes applied (see plan of 2026-11-09):
      UGA builder picks them up for the TOC.
 
 Usage:  python3 build_20261109.py            (run from dissertation-docs/)
+        python3 build_20261109.py --mark     writes dissertation-20261109-marked.docx with every
+                                             inserted or rewritten passage in blue (Figures 1-3 are
+                                             image swaps and cannot be coloured; heading restyles
+                                             change no text and are left black)
 Then:   python3 build_uga_pdf.py dissertation-20261109.docx .
 """
 import copy
@@ -31,7 +35,12 @@ from docx.text.paragraph import Paragraph
 HERE = Path(__file__).resolve().parent
 CODE = HERE.parent / 'dissertation-code'
 SRC = HERE / 'dissertation-20261029.docx'
-OUT = HERE / 'dissertation-20261109.docx'
+MARK = '--mark' in sys.argv[1:]
+OUT = HERE / ('dissertation-20261109-marked.docx' if MARK else 'dissertation-20261109.docx')
+BLUE = '0000FF'
+# schema order of w:rPr children (subset); w:color must precede spacing/sz/u/lang etc.
+RPR_AFTER_COLOR = ('spacing', 'w', 'kern', 'position', 'sz', 'szCs', 'highlight', 'u', 'effect', 'bdr', 'shd',
+                   'fitText', 'vertAlign', 'rtl', 'cs', 'em', 'lang', 'eastAsianLayout', 'specVanish', 'oMath')
 
 FIG_DIR = CODE / 'v2_post_modifications' / 'output' / 'figures' / 'interactions'
 FIG1 = FIG_DIR / 'not-significant' / 'm5_gender_negfw_m3_simpleslopes.png'  # 03c files gender by factor name -> lands here
@@ -73,9 +82,65 @@ def contains(s):
     return lambda t: s in t
 
 
+def mark_run(r_el):
+    """Colour a w:r element blue (only when MARK). Idempotent, schema-ordered."""
+    if not MARK:
+        return r_el
+    rpr = r_el.find(W + 'rPr')
+    if rpr is None:
+        rpr = r_el.makeelement(W + 'rPr', {})
+        r_el.insert(0, rpr)
+    col = rpr.find(W + 'color')
+    if col is None:
+        col = rpr.makeelement(W + 'color', {})
+        idx = len(rpr)
+        for i, c in enumerate(rpr):
+            if c.tag.split('}')[1] in RPR_AFTER_COLOR:
+                idx = i
+                break
+        rpr.insert(idx, col)
+    col.attrib.clear()
+    col.set(W + 'val', BLUE)
+    return r_el
+
+
+def _changed_span(old, new):
+    """Word-boundary common prefix/suffix of old vs new; returns (head, middle, tail) of `new`
+    where `middle` is the text that actually changed. Pure deletions mark all of `new`."""
+    ow, nw = old.split(' '), new.split(' ')
+    i = 0
+    while i < min(len(ow), len(nw)) and ow[i] == nw[i]:
+        i += 1
+    j = 0
+    while j < min(len(ow), len(nw)) - i and ow[-1 - j] == nw[-1 - j]:
+        j += 1
+    mid = nw[i:len(nw) - j]
+    if not mid:
+        return '', new, ''
+    head = ' '.join(nw[:i]) + (' ' if i else '')
+    tail = (' ' if j else '') + ' '.join(nw[len(nw) - j:])
+    return head, ' '.join(mid), tail
+
+
+def _clone_run(r_el, text):
+    c = copy.deepcopy(r_el)
+    for junk in c.findall(W + 'lastRenderedPageBreak') + c.findall(W + 'tab') + c.findall(W + 'br'):
+        c.remove(junk)
+    ts = c.findall(W + 't')
+    for extra in ts[1:]:
+        c.remove(extra)
+    t = ts[0] if ts else c.makeelement(W + 't', {})
+    if not ts:
+        c.append(t)
+    t.text = text
+    t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    return c
+
+
 def replace_in_para(p, old, new, must=True):
     """Replace `old` with `new` inside paragraph p, run-aware (keeps formatting of the
-    run where the match begins; text of later runs covered by the match is removed)."""
+    run where the match begins; text of later runs covered by the match is removed).
+    With MARK, the changed words of `new` are split into their own blue run."""
     runs = p.runs
     full = ''.join(r.text for r in runs)
     pos = full.find(old)
@@ -96,7 +161,15 @@ def replace_in_para(p, old, new, must=True):
             first = r
             head = r.text[:pos - a]
             tail = r.text[end - a:] if end <= b else ''
-            r.text = head + new + tail
+            if MARK:
+                h2, mid, t2 = _changed_span(old, new)
+                r.text = head + h2
+                blue = mark_run(_clone_run(r._r, mid))
+                r._r.addnext(blue)
+                if t2 + tail:
+                    blue.addnext(_clone_run(r._r, t2 + tail))
+            else:
+                r.text = head + new + tail
         else:
             r.text = r.text[end - a:] if end < b else ''
     return True
@@ -140,7 +213,7 @@ def new_para_after(anchor_el, runs, style=None):
         t = r.makeelement(W + 't', {'{http://www.w3.org/XML/1998/namespace}space': 'preserve'})
         t.text = text
         r.append(t)
-        p.append(r)
+        p.append(mark_run(r))
     anchor_el.addnext(p)
     return p
 
@@ -261,6 +334,7 @@ class TableTemplate:
         t = r.find(W + 't')
         t.text = text
         t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+        mark_run(r)
         return tc
 
     def build(self, widths, header, rows, *, left_cols=(0,), summary_rows=()):
@@ -788,12 +862,13 @@ def main():
 
     # add Big Five / attrition sentence to Summary of Findings (end of the replicability/multiverse paragraph)
     _, p = find_para(doc, contains('Cross-wave replicability, assessed using the Open Science Collaboration (2015) criteria, was poor.'))
-    p.add_run(' Two supplementary analyses reinforce this reading: adjusting for the Big Five '
-              'personality traits did not uncover an executive functioning effect in the full models, and the positive '
-              'zero-order association between executive functioning and negative spillover that appeared when only '
-              'personality was controlled did not survive the inclusion of job and family demands and demographic covariates. '
-              'At the same time, attrition between waves was selective on executive functioning, so the later-wave '
-              'analytic sample under-represents respondents with lower executive functioning.')
+    extra = p.add_run(' Two supplementary analyses reinforce this reading: adjusting for the Big Five '
+                      'personality traits did not uncover an executive functioning effect in the full models, and the positive '
+                      'zero-order association between executive functioning and negative spillover that appeared when only '
+                      'personality was controlled did not survive the inclusion of job and family demands and demographic covariates. '
+                      'At the same time, attrition between waves was selective on executive functioning, so the later-wave '
+                      'analytic sample under-represents respondents with lower executive functioning.')
+    mark_run(extra._r)
 
     # ---------------------------------------------------------------- 8. restyle Discussion sub-headings
     for heading in ('Practical Implications', 'Conclusion'):
